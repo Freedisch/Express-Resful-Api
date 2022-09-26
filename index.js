@@ -22,14 +22,8 @@ app.get("/api/genres/:id", (req, res) => {
 });
 
 app.post("/api/genres", (req, res) => {
-  const schema = {
-    name: Joi.string().min(3).required(),
-  };
-  const result = Join.validate(req.body, schema);
-  if (result.error) {
-    res.status(404).send(result.error.details[0].message);
-    return;
-  }
+  const { error } = ValidateGenre(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
   const genre = {
     id: genres.length + 1,
     name: req.body.name,
@@ -40,24 +34,41 @@ app.post("/api/genres", (req, res) => {
 
 app.put("/api/genres/:id", (req, res) => {
   //Validating
-  const genre = genres.find((c) => (c.id === c.id) === parseInt(req.params.id));
-  if (!genre) res.status(404).send("The genre with the given Id doesn't exist");
+  const genre = genres.find((c) => c.id === parseInt(req.params.id));
+  if (!genre)
+    return res.status(404).send("The genre with the given Id doesn't exist");
   //If invalid return bad request 400
 
-  const schema = {
-    name: Joi.string().min(3).required(),
-  };
-
-  const result = Join.validate(req.body, schema);
-  if (result.error) {
-    res.status(404).send(result.error.details[0].message);
-    return;
+  const { error } = ValidateGenre(req.body);
+  if (error) {
+    return res.status(404).send(error.details[0].message);
   }
   // Update the genre
   genre.name = req.body.name;
   //Return the updated genre
   res.send(genre);
 });
+
+app.delete("/api/genres/:id", (req, res) => {
+  //Look for the genre
+  // Not existing , return 404
+  const genre = genres.find((c) => c.id === parseInt(req.params.id));
+  if (!genre) res.status(404).send("The genre with the given Id doesn't exist");
+
+  //Delete
+  const index = genres.indexOf(genre);
+  genres.splice(index, 1);
+  // Return the same object
+  res.send(genre);
+});
+
+function ValidateGenre(genre) {
+  const schema = {
+    name: Joi.string().min(3).required(),
+  };
+
+  return Joi.validate(genre, schema);
+}
 
 const port = process.env.port || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
