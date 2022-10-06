@@ -1,41 +1,62 @@
-const genres = [
-  { id: 0, type: "Romance" },
-  { id: 0, type: "Fiction" },
-  { id: 2, type: "Action" },
-];
+const { Movie, validate } = require("../Models/movieModel");
+const { Genre } = require("../Models/genreModel");
+const mongoose = require("mongoose");
 
-exports.genres_list = (req, res) => {
-  res.send(genres);
+//GET Request
+exports.genres_list = async (req, res) => {
+  const movies = await Genre.find().sort("name");
+  res.send(movies);
 };
+// exports.genres_get_id = async (req, res) => {
+//   const movies = await Movie.find().sort("name");
+//   res.send(movies);
+// };
 
-exports.genres_get_id = (req, res) => {
-  const genre = genres.find((c) => c.id === parseInt(req.params.id));
-  if (!genre) res.status(404).send("Genre not found");
-  res.send(genre);
+//POST request
+exports.genres_post = async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const genre = await Genre.findById(req.body.genreId);
+  if (!genre) return res.status(400).send(error.details[0].message);
+
+  let movie = new Movie({
+    title: req.body.name,
+    genre: {
+      _id: genre._id,
+      name: genre.name,
+    },
+    numberInStock: req.body.numberInStock,
+    dailyRentaleRate: req.body.dailyRentaleRate,
+  });
+
+  movie = await movie.save();
+  res.send(movie);
 };
+//PUT Request
+exports.genres_put = async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
-exports.genres_post = (req, res) => {
-  const genre = {
-    id: genres.length + 1,
-    type: req.body.name,
-  };
-  genres.push(genre);
-  res.send(genre);
+  const genre = await Genre.findById(req.body.genreId);
+  if (!genre) return res.status(400).send("Invalid genre");
+
+  const movie = await Movie.findByIdAndUpdate(
+    req.params.id,
+    {
+      title: req.body.title,
+      genre: {
+        _id: genre._id,
+        name: genre.name,
+      },
+      numberInStock: req.body.numberInStock,
+      dailyRentaleRate: req.body.dailyRentaleRate,
+    },
+    { new: true }
+  );
+  if (!movie)
+    return res.status(404).send("The movie with the given Id was not correct");
+  res.send(movie);
 };
-
-exports.genres_put = (req, res) => {
-  const genre = genres.find((c) => c.id === parseInt(req.params.id));
-  genre.name = req.body.name;
-  res.send(genre);
-};
-
-exports.genres_delete = (req, res) => {
-  const genre = find((c) => c.id === parseInt(req.params.id));
-  if (!genre) res.status(404).send("The genre with the given Id doesn't exist");
-
-  //Delete
-  const index = genres.indexOf(genre);
-  genres.splice(index, 1);
-  // Return the same object
-  res.send(genre);
-};
+// //DELETE Request
+// exports.genres_delete = (req, res) => {};
