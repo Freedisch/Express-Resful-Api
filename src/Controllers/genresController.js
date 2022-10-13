@@ -21,7 +21,7 @@ exports.genres_post = async (req, res) => {
   if (!genre) return res.status(400).send(error.details[0].message);
 
   let movie = new Movie({
-    title: req.body.name,
+    title: req.body.title,
     genre: {
       _id: genre._id,
       name: genre.name,
