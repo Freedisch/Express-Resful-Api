@@ -1,6 +1,7 @@
 const { User, validateUser } = require("../Models/user");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const { createTokens } = require("../JWT");
 
 exports.registerUser = async (req, res) => {
   const { error } = validateUser(req.body);
@@ -38,7 +39,12 @@ exports.loginUser = async (req, res) => {
     if (!match) {
       res.status(400).send({ error: "Password incorrect" });
     } else {
-      res.send("LOG IN");
+      const accessToken = createTokens(user);
+
+      res.cookie("access-token", accessToken, {
+        maxAge: 60 * 60 * 24 * 30 * 100,
+      });
+      res.send(accessToken);
     }
   });
 };

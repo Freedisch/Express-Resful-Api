@@ -2,6 +2,7 @@ const genres = require("../Express-Resful-Api/src/Routes/genres.js");
 const express = require("express");
 const mongoose = require("mongoose");
 const users = require("./src/Routes/User");
+const cookieParser = require("cookie-parser");
 
 //Express app
 const app = express();
@@ -18,6 +19,7 @@ mongoose
 
 //Calling Genres routes
 app.use(express.json());
+app.use(cookieParser());
 app.use("/genres", genres);
 app.use("/", users);
 //Port configuration
