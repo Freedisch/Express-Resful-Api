@@ -1,4 +1,4 @@
-const config = require("config");
+//const config = require("config");
 const mongoose = require("mongoose");
 const { User } = require("../Models/user");
 const jwt = require("jsonwebtoken");
@@ -14,7 +14,10 @@ exports.userLogin = async (req, res) => {
   const password = await bcrypt.compare(req.body.password, user.password);
   if (!password) return res.status(400).send("email or password invalid");
 
-  const token = jwt.sign({ _id: user._id }, config.get("jwtPrivateKey"));
+  const token = jwt.sign(
+    { _id: user._id },
+    "Oi6LTsqOn7bPGoQuoCeGJo3g4/1n5n+2xxZfmjamQ/c="
+  );
 };
 
 function validate(user) {

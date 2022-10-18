@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const { User, validateUser } = require("../Models/user");
 const bcrypt = require("bcrypt");
@@ -18,5 +19,10 @@ exports.registerUser = async (req, res) => {
     password: password,
   });
   await user.save();
-  res.send(user);
+
+  const token = jwt.sign(
+    { _id: user._id },
+    "Oi6LTsqOn7bPGoQuoCeGJo3g4/1n5n+2xxZfmjamQ/c="
+  );
+  res.header("x-auth-token", token).send(user);
 };

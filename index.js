@@ -1,4 +1,4 @@
-const config = require("config");
+//const config = require("config");
 const genres = require("../Express-Resful-Api/src/Routes/genres.js");
 const express = require("express");
 const mongoose = require("mongoose");
@@ -10,10 +10,10 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 //Environment variables configuration
-if (!config.get("jwtPrivateKey")) {
-  console.error("Fatal error jwtPrivateKey not defined");
-  process.exit(1);
-}
+// if (!config.get("jwtPrivateKey")) {
+//   console.error("Fatal error jwtPrivateKey not defined");
+//   process.exit(1);
+// }
 //Connecting to mongodb
 const dbURI =
   "mongodb+srv://Freenine:Tuu2ShHdLsypDl3X@nextproject.qqkbxd5.mongodb.net/Testdb67?retryWrites=true&w=majority";
